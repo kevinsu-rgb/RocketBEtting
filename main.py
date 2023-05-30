@@ -32,12 +32,15 @@ first_game = "77b271fe12fca03c618f63dfb79d4105726ba9d4a25bb3f1964e435ccf9cb209"
 results = []
 current = 0
 count = 0
-game_finish = False
-
-while game_hash != first_game and game_finish == False:
-    print(get_result(game_hash))
+Results_empty = False
+while game_hash != first_game and Results_empty == False:
+    results.append(get_result(game_hash))
     count += 1
     game_hash = get_prev_game(game_hash)
+
+for i in range(count):
+    print(results[i])
+
 
 results = np.array(results)
 

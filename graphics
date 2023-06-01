@@ -1,0 +1,76 @@
+import pygame
+pygame.init()
+
+# Set up the display window
+width, height = 800, 600
+screen = pygame.display.set_mode((width, height))
+
+# Define initial and final graph states
+initial_graph = [(0, 0), (0.1, 0)]  # Range of x-values for initial state
+final_graph = [(0, 0), (10, 0)]  # Range of x-values for final state
+
+def interpolate_graph(initial, final, time):
+    # Ensure the initial and final states have the same length
+    if len(initial) != len(final):
+        raise ValueError("Initial and final graph states must have the same length")
+
+    interpolated_graph = []
+    for i in range(len(initial)):
+        x = initial[i][0] + (final[i][0] - initial[i][0]) * time
+        y = 0.00540133 * (x ** 2) + 0.0143903 * x + 1.10151
+        interpolated_graph.append((x, y))
+    return interpolated_graph
+
+clock = pygame.time.Clock()
+is_running = True
+time = 0.0
+
+# Calculate scaling factors
+x_scale = width / (final_graph[1][0] - final_graph[0][0])
+y_scale = height / 10  # Scale for the y-axis
+
+while is_running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            is_running = False
+
+    screen.fill((255, 255, 255))
+
+    interpolated = interpolate_graph(initial_graph, final_graph, time)
+
+    # Scale the graph coordinates based on the scaling factors
+    scaled_graph = []
+    for point in interpolated:
+        x = point[0] * x_scale
+        y = height - (point[1] * y_scale)
+        scaled_graph.append((x, y))
+
+    pygame.draw.lines(screen, (0, 0, 0), False, scaled_graph, 2)
+
+    # Calculate the current y-value based on the time parameter
+    current_y = 0.00464901 * ((final_graph[1][0] - final_graph[0][0]) * time) ** 2 + \
+                0.0504268 * ((final_graph[1][0] - final_graph[0][0]) * time) + 1.01103
+
+    # Create a font object
+    font = pygame.font.Font(None, 60)
+
+    # Create a text surface with the formatted y-value
+    multiplier = font.render(f"{current_y:.2f}", True, (0, 0, 0))
+    # Calculate the center position of the text surface
+    multiplier_rect = multiplier.get_rect(center=(width // 2, height // 2))
+    # Draw the text surface on the screen
+    screen.blit(multiplier, multiplier_rect)
+
+    # Create a text surface with the formatted y-value
+    timeText = font.render(f"{time:.2f}", True, (0, 0, 0))
+    # Calculate the center position of the text surface
+    timeText_rect = timeText.get_rect(center=(100, 100))
+    # Draw the text surface on the screen
+    screen.blit(timeText, timeText_rect)
+
+    time += 0.01
+
+    pygame.display.flip()
+    clock.tick(60)
+
+pygame.quit()

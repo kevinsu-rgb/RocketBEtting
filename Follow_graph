@@ -1,0 +1,66 @@
+import pygame
+import math
+
+# Initialize Pygame
+pygame.init()
+
+# Set up the window
+width, height = 800, 600
+window = pygame.display.set_mode((width, height))
+pygame.display.set_caption("Curve Graph")
+
+# Colors
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+
+# Curve parameters
+amplitude = 100
+frequency = 0.02
+speed = 2
+
+# Initialize variables
+x_pos = 0
+points = []
+graph_offset = 0
+
+# Game loop
+running = True
+clock = pygame.time.Clock()
+
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+    # Clear the window
+    window.fill(BLACK)
+
+    # Calculate the y-coordinate of the curve
+    y = height // 2 + amplitude * math.sin(frequency * x_pos)
+
+    # Add the new point to the list of points
+    points.append((x_pos, y))
+
+    # Remove points that are outside the window
+    points = [(x, y) for x, y in points if x > -10]
+
+    # Update the graph offset based on the current x-coordinate
+    if x_pos > width - 50:
+        graph_offset = x_pos - width + 50
+
+    # Draw the curve with the graph offset
+    if len(points) >= 2:
+        adjusted_points = [(x - graph_offset, y) for x, y in points]
+        pygame.draw.lines(window, WHITE, False, adjusted_points, 2)
+
+    # Update the x-coordinate of the curve
+    x_pos += speed
+
+    # Update the display
+    pygame.display.flip()
+
+    # Limit the frame rate
+    clock.tick(60)
+
+# Quit the program
+pygame.quit()
